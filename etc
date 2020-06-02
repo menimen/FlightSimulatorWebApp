@@ -4,3 +4,12 @@ id: 205697139
 
 name: Meni Ashurov
 id: 204064257
+
+UnitTest:
+
+1. we tested SetFlight function in Flight class : SetFlightTest_TwoSameFlight_ReturnsTrue_
+the function creates a new Flight and sets all the props, than it tests that the setFlight worked properly.
+
+2. we tested GetServersList in ServerController : GetServersList_SameServers_ReturnsTrue
+the function initializes a server, then using MOCK func to test the functionality - we ask the list of servers, we get the only server
+we have on the list - then return true after it tests all the props with the server we intially sent.
