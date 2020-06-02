@@ -438,8 +438,7 @@ namespace FlightControlWeb.Controllers
                 int count = 0;
                 foreach (Flight ext_flight in external_flights) // if new flight id is different from all flights
                 {
-                    count  = count + SaveExternalFlightsElseElseLoopCompare(ext_flight, count,
-                        flight);
+                    count = count + SaveExternalFlightsElseElseLoopCompare(ext_flight, flight);
                 }
                 if (count == external_flights.Count)
                 {
@@ -448,15 +447,19 @@ namespace FlightControlWeb.Controllers
             }
         }
 
-        private int SaveExternalFlightsElseElseLoopCompare(Flight ext_flight, int count,
-            Flight flight)
+        // **************************** 
+        private int SaveExternalFlightsElseElseLoopCompare(Flight ext_flight, Flight flight)
         {
             if (ext_flight.FlightID.CompareTo(flight.FlightID) != 0)
             {
-                count++;
+                return 1;
+            } else
+            {
+                return 0;
             }
-            return count;
+            
         }
+        // *****************************
         private string ParseTime(DateTime time)
         {
             //string[] words = time.Split(' ');
