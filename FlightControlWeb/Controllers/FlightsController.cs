@@ -114,8 +114,10 @@ namespace FlightControlWeb.Controllers
             {
                 if (flights.ContainsKey(flight.ID))
                 {
-                    flights[flight.ID].Latitude = cameFromLati + (relative * (element.Latitude - cameFromLati));
-                    flights[flight.ID].Longitude = cameFromLong + (relative * (element.Longitude - cameFromLong));
+                    flights[flight.ID].Latitude = cameFromLati + (relative * (element.Latitude -
+                        cameFromLati));
+                    flights[flight.ID].Longitude = cameFromLong + (relative * (element.Longitude -
+                        cameFromLong));
                 }
             }
         }
