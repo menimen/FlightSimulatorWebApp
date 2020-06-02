@@ -143,36 +143,36 @@ namespace FlightControlWeb.Controllers
                 _flight.Longitude = cameFromLong + (relative * (element.Longitude - cameFromLong));
             }
         }
-
+        
         [Route("flights")]
-        [HttpGet]
-        //get list of active internal flights based on Datetime given as a parameter
-        public async Task<IList<Flight>> GetFlightByDate(DateTime relative_to)
-        {
-            bool sync_all = Request.Query.ContainsKey("sync_all");
-            List<Flight> flightslist = new List<Flight>();
-            DateTime utcDate = relative_to.ToUniversalTime();
+         [HttpGet]
+         //get list of active internal flights based on Datetime given as a parameter
+         public async Task<IList<Flight>> GetFlightByDate(DateTime relative_to)
+         {
+             bool sync_all = Request.Query.ContainsKey("sync_all");
+             List<Flight> flightslist = new List<Flight>();
+             DateTime utcDate = relative_to.ToUniversalTime();
 
-            await Task.Run(() => ImportExternalFlights());
-            if (_cache.TryGetValue("flightplans", out List<FlightPlan> flightplans))
-            {
-                //find all active internal flightplans with time bigger\equal to datetime given as a parameter
-                List<FlightPlan> nonPlannedFlights = flightplans.FindAll(g =>
-                g.Initial_Location.Date_Time <= utcDate);
-                await Task.Run(() => nonPlannedFlights.ForEach(flight =>
-                {
-                    //convert the flightplan's segment to list
-                    var segments = flight.Segments.ToList();
-                    //sum the total time of the journey of the plane through the segments
-                    int totalTimeSpan = segments.Sum(v => v.Timespan_seconds);
-                    GetFlightByDateTimeCheck(flight, totalTimeSpan, utcDate, sync_all,
-                        flightslist);
-                }));
+             await Task.Run(() => ImportExternalFlights());
+             if (_cache.TryGetValue("flightplans", out List<FlightPlan> flightplans))
+             {
+                 //find all active internal flightplans with time bigger\equal to datetime given as a parameter
+                 List<FlightPlan> nonPlannedFlights = flightplans.FindAll(g =>
+                 g.Initial_Location.Date_Time <= utcDate);
+                 await Task.Run(() => nonPlannedFlights.ForEach(flight =>
+                 {
+                     //convert the flightplan's segment to list
+                     var segments = flight.Segments.ToList();
+                     //sum the total time of the journey of the plane through the segments
+                     int totalTimeSpan = segments.Sum(v => v.Timespan_seconds);
+                     GetFlightByDateTimeCheck(flight, totalTimeSpan, utcDate, sync_all,
+                         flightslist);
+                 }));
 
-                return flightslist;
-            }
-            return null;
-        }
+                 return flightslist;
+             }
+             return null;
+         }
         private void GetFlightByDateTimeCheck(FlightPlan flight, int totalTimeSpan,
             DateTime utcDate, bool sync_all, List<Flight> flightslist)
         {
@@ -323,6 +323,7 @@ namespace FlightControlWeb.Controllers
                 temp.Add(_flight);
             }
         }
+        
         private void FindExternalFlightPlans(List<Flight> external_flights, string URL)
         {
             string request_str = URL + "/api/FlightPlan/";
@@ -358,6 +359,7 @@ namespace FlightControlWeb.Controllers
                 FlightPlan flightPlan = JsonConvert.DeserializeObject<FlightPlan>(flightPlanStr);
                 if (flightPlan.Company_Name != null)
                 {
+                    flightPlan.ID = id;
                     SaveExternalFlightPlansIf(flightPlan, id);
                 }
             }
@@ -370,7 +372,6 @@ namespace FlightControlWeb.Controllers
 
         private void SaveExternalFlightPlansIf(FlightPlan flightPlan, string id)
         {
-            flightPlan.ID = id;
             if (!_cache.TryGetValue("flightplans", out List<FlightPlan> flightPlans))
             {
                 flightPlans = new List<FlightPlan>();
@@ -382,7 +383,7 @@ namespace FlightControlWeb.Controllers
                 int count = 0;
                 foreach (FlightPlan plan in flightPlans) // if new flight id is different from all flights
                 {
-                    count = count + SaveExternalFlightPlansIfElseLoopIf(flightPlan, plan, count);
+                    count = count + SaveExternalFlightPlansIfElseLoopIf(flightPlan, plan);
                 }
                 if (count == flightPlans.Count)
                 {
@@ -391,16 +392,18 @@ namespace FlightControlWeb.Controllers
                 }
             }
         }
-        private int SaveExternalFlightPlansIfElseLoopIf(FlightPlan flightPlan, FlightPlan plan,
-            int count)
+        private int SaveExternalFlightPlansIfElseLoopIf(FlightPlan flightPlan, FlightPlan plan)
         {
             if (flightPlan.ID.CompareTo(plan.ID) != 0)
             {
-                count++;
+                return 1;
+            } else
+            {
+                return 0;
             }
-            return count;
         }
 
+        
         private void SaveExternalFlights(List<Flight> flights)
         {
             if (!_cache.TryGetValue("externalFlights", out List<Flight> external_flights))
@@ -447,7 +450,6 @@ namespace FlightControlWeb.Controllers
             }
         }
 
-        // **************************** 
         private int SaveExternalFlightsElseElseLoopCompare(Flight ext_flight, Flight flight)
         {
             if (ext_flight.FlightID.CompareTo(flight.FlightID) != 0)
@@ -459,7 +461,6 @@ namespace FlightControlWeb.Controllers
             }
             
         }
-        // *****************************
         private string ParseTime(DateTime time)
         {
             //string[] words = time.Split(' ');
