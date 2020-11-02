@@ -1,0 +1,24 @@
+{"passengers": 400,
+      "company_name": "serverflight1meni",
+	  "initial_location": {
+	    "longitude": 34.244,
+		"latitude": 31.12,
+		"date_time": "2020-08-17T18:49:00"
+	  },
+      "segments": [{
+        "longitude": 35.234,
+		"latitude": 33.18,
+		"timespan_seconds": 10
+      } ,
+	  {
+        "longitude": 38.234,
+		"latitude": 35.18,
+		"timespan_seconds": 99
+      }, 
+	  {
+        "longitude": 39.234,
+		"latitude": 37.18,
+		"timespan_seconds": 99
+      }
+	  ]
+}
